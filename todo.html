@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To Do List</title>
+</head>
+    <body>
+        <input id="add-list" type="text" />
+        <input id="date-picker" type="date">
+        <button onclick="addToDo()">Add To Do</button>
+
+        <div id="todo-list"></div>
+        <script>
+
+            // Model
+            // If localstorage has a todos array then use it, 
+            // Otherwise use the default array
+            let toDos;
+
+            // Retrieve array from localstorage 
+            // JSON.parse convert sting to array, .stringify convert array to string
+            const savedTodo = JSON.parse(localStorage.getItem('toDos'));
+
+            // Check if is array
+            if (Array.isArray(savedTodo)) {
+                toDos = savedTodo;
+
+            } else {
+                toDos =  [{
+                    title: "h1",
+                    dueDate: "2021-02-03",
+                    id: "id1"
+                }, {
+                    title: "h2",
+                    dueDate: "2021-02-03",
+                    id: "id2"
+                }, {
+                    title: "h3",
+                    dueDate: "2021-02-03",
+                    id: "id3"
+                }];   
+            }
+
+            render();
+
+            function createToDo(title, dueDate) {
+                const id = " " + new Date().getTime();
+
+                toDos.push({
+                    title: title,
+                    dueDate: dueDate,
+                    id: id
+                });
+
+                saveToDos();
+            }
+
+            function removeTodo(idToDelete) {
+                toDos = toDos.filter(function (todo) {
+                    if (todo.id === idToDelete) {
+                        return false; 
+                    }else{
+                        return true;
+                    }
+                });
+
+                saveToDos();
+            }
+
+            function saveToDos() {
+                localStorage.setItem('toDos', JSON.stringify(toDos));
+            }
+            
+            // Controller
+            function addToDo() {
+                const textBox = document.getElementById("add-list");
+                const title = textBox.value;
+
+                const datePicker = document.getElementById("date-picker");
+                const dueDate = datePicker.value;
+                
+                createToDo(title, dueDate);
+
+                render();
+            }
+
+            function deleteToDo (event) {
+                const deleteButton = event.target;
+                const idToDelete = deleteButton.id;
+
+                removeTodo(idToDelete);
+
+                render();
+            }
+
+            // View
+            function render() {
+                document.getElementById("todo-list").innerText = "";
+
+                toDos.forEach(function(todo) {
+                    const element = document.createElement("div");
+                    element.innerText = todo.title + ' ' + todo.dueDate;
+
+                    const deleteButton = document.createElement("button");
+                    deleteButton.innerText = "delete";
+                    deleteButton.onclick = deleteToDo;
+                    deleteButton.id = todo.id;
+                    element.appendChild(deleteButton);
+                
+                    const list = document.getElementById("todo-list");
+                    list.appendChild(element);  
+                });
+            }
+
+        </script>  
+    </body>
+</html>
